@@ -1,0 +1,135 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
+class Visitor {
+    String name;
+    String purpose;
+    String entryTime;
+
+    public Visitor(String name, String purpose, String entryTime) {
+        this.name = name;
+        this.purpose = purpose;
+        this.entryTime = entryTime;
+    }
+
+    public String toString() {
+        return "<html>Name: " + name + "<br>Purpose: " + purpose + "<br>Entry Time: " + entryTime + "<br>--------------------------</html>";
+    }
+}
+
+public class VisitorManagementSystem extends JFrame {
+
+    private ArrayList<Visitor> visitors = new ArrayList<>();
+    private JTextField nameField, purposeField, entryTimeField, searchField;
+    private JTextArea displayArea;
+
+    public VisitorManagementSystem() {
+        setTitle("Visitor Management System");
+        setSize(600, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Panel for adding visitors
+        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        inputPanel.setBorder(BorderFactory.createTitledBorder("Add Visitor"));
+
+        inputPanel.add(new JLabel("Name:"));
+        nameField = new JTextField(15);
+        inputPanel.add(nameField);
+
+        inputPanel.add(new JLabel("Purpose:"));
+        purposeField = new JTextField(15);
+        inputPanel.add(purposeField);
+
+        inputPanel.add(new JLabel("Entry Time:"));
+        entryTimeField = new JTextField(15);
+        inputPanel.add(entryTimeField);
+
+        JButton addVisitorButton = new JButton("Add Visitor");
+        addVisitorButton.addActionListener(e -> addVisitor());
+        inputPanel.add(addVisitorButton);
+
+        // Panel for viewing and searching visitors
+        JPanel actionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        actionPanel.setBorder(BorderFactory.createTitledBorder("Actions"));
+
+        JButton viewAllVisitorsButton = new JButton("View All Visitors");
+        viewAllVisitorsButton.addActionListener(e -> viewAllVisitors());
+        actionPanel.add(viewAllVisitorsButton);
+
+        actionPanel.add(new JLabel("Search by Name:"));
+        searchField = new JTextField(15);
+        actionPanel.add(searchField);
+
+        JButton searchVisitorButton = new JButton("Search Visitor");
+        searchVisitorButton.addActionListener(e -> searchVisitorByName());
+        actionPanel.add(searchVisitorButton);
+
+        // Display Area
+        displayArea = new JTextArea(10, 40);
+        displayArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(displayArea);
+
+        // Layout
+        add(inputPanel, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+        add(actionPanel, BorderLayout.SOUTH);
+    }
+
+    private void addVisitor() {
+        String name = nameField.getText().trim();
+        String purpose = purposeField.getText().trim();
+        String entryTime = entryTimeField.getText().trim();
+
+        if (!name.isEmpty() && !purpose.isEmpty() && !entryTime.isEmpty()) {
+            visitors.add(new Visitor(name, purpose, entryTime));
+            displayArea.setText("Visitor added successfully!");
+            clearFields();
+        } else {
+            displayArea.setText("Please fill in all fields.");
+        }
+    }
+
+    private void viewAllVisitors() {
+        if (visitors.isEmpty()) {
+            displayArea.setText("No visitors found.");
+        } else {
+            StringBuilder builder = new StringBuilder("List of All Visitors:\n\n");
+            for (Visitor visitor : visitors) {
+                builder.append(visitor.toString()).append("\n\n");
+            }
+            displayArea.setText(builder.toString());
+        }
+    }
+
+    private void searchVisitorByName() {
+        String searchName = searchField.getText().trim();
+        boolean found = false;
+
+        if (!searchName.isEmpty()) {
+            StringBuilder builder = new StringBuilder();
+            for (Visitor visitor : visitors) {
+                if (visitor.name.equalsIgnoreCase(searchName)) {
+                    builder.append(visitor.toString()).append("\n\n");
+                    found = true;
+                }
+            }
+            displayArea.setText(found ? builder.toString() : "Visitor with the name '" + searchName + "' not found.");
+        } else {
+            displayArea.setText("Please enter a name to search.");
+        }
+    }
+
+    private void clearFields() {
+        nameField.setText("");
+        purposeField.setText("");
+        entryTimeField.setText("");
+        searchField.setText("");
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new VisitorManagementSystem().setVisible(true));
+    }
+}
